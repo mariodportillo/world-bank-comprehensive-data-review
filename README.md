@@ -2,6 +2,9 @@
 
 A standalone interactive website using the World Bank Indicators API. GitHub Pages serves the files in `web/`; the visitor's browser requests public data directly from `https://api.worldbank.org/v2/`. The notebook at https://observablehq.com/d/c304524d9309cd1a uses this same API. BigQuery is not part of this implementation.
 
+- Website: https://mariodportillo.github.io/world-bank-comprehensive-data-review/
+- Source repository: https://github.com/mariodportillo/world-bank-comprehensive-data-review
+
 This is a functional starting point for the site's data interactions. The visual design and analytical views can evolve without changing the hosting setup.
 
 ## Run locally
@@ -28,13 +31,13 @@ The source catalogs were prepared in the parent research project. Everything nee
 
 ## GitHub Pages deployment
 
-Suggested repository name: `world-bank-comprehensive-data-review`.
+Repository name: `world-bank-comprehensive-data-review`.
 
 1. Add this folder's contents to that dedicated repository, on its `main` branch.
 2. In repository Settings → Pages, select **GitHub Actions** as the publishing source.
 3. The included `.github/workflows/pages.yml` checks the JavaScript and tests, then uploads only `web/` and deploys it to Pages.
 
-The expected project-site URL is `https://OWNER.github.io/world-bank-comprehensive-data-review/`. Every local asset uses a relative URL, so the repository path works without a bundler, custom domain, or base-path rewrite. All data requests are public API reads and need no API key, paid database, or application server.
+The project-site URL is `https://mariodportillo.github.io/world-bank-comprehensive-data-review/`. Every local asset uses a relative URL, so the repository path works without a bundler, custom domain, or base-path rewrite. All data requests are public API reads and need no API key, paid database, or application server.
 
 ## Checks
 

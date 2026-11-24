@@ -13,4 +13,4 @@ Checked locally on November 24, 2026.
 - The page had no horizontal overflow at the browser's observed 752-pixel content width.
 - The CSV serialization checks passed. Browser download automation was interrupted, so the native file-save flow has not been independently verified.
 
-The user chose to keep the website local on November 24, 2026. No public repository or GitHub Pages deployment was created. The local repository includes the Pages workflow for a later publication decision.
+Public publication was approved on November 24, 2026. The public repository is `mariodportillo/world-bank-comprehensive-data-review`, and GitHub Pages is configured to use the included Actions workflow. Each deployment runs the automated checks before publishing the `web/` directory. The Actions run and Pages deployment status provide the current publication result.
