@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore World Bank indicators, compare countries over time, inspect reporting gaps, and download the data behind each view.">
+  <meta name="theme-color" content="#153c64">
+  <title>World Bank Comprehensive Data Review</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <a class="skip-link" href="#results">Skip to results</a>
+  <header class="site-header">
+    <div class="wordmark"><span class="mark" aria-hidden="true">W</span><span>World Bank<br><strong>Comprehensive Data Review</strong></span></div>
+    <a href="https://data.worldbank.org/" target="_blank" rel="noreferrer">World Bank Open Data ↗</a>
+  </header>
+  <main>
+    <section class="intro">
+      <p class="eyebrow">Data explorer · Initial working version</p>
+      <h1>Start with a question.<br>Explore the evidence.</h1>
+      <p>Find an indicator, compare countries, and follow how the numbers change. Keep the reporting years and missing data in view.</p>
+    </section>
+    <div class="workspace">
+      <aside class="controls">
+        <h2>Build a comparison</h2>
+        <form id="query-form">
+          <label for="source">Database</label>
+          <select id="source" name="source" required></select>
+          <label for="search">Find an indicator</label>
+          <input id="search" type="search" placeholder="Name or indicator code" autocomplete="off">
+          <label for="indicator">Indicator <span id="match-count" class="muted"></span></label>
+          <select id="indicator" required></select>
+          <label for="countries">Countries <span class="muted">Choose up to 8</span></label>
+          <select id="countries" multiple size="6" aria-describedby="country-help" required></select>
+          <small id="selected-countries" aria-live="polite"></small>
+          <small id="country-help">Hold ⌘ on Mac or Ctrl on Windows to select several countries.</small>
+          <div class="year-fields">
+            <div><label for="start-year">First year</label><input id="start-year" type="number" min="1800" max="2100" value="2010" required></div>
+            <div><label for="end-year">Last year</label><input id="end-year" type="number" min="1800" max="2100" value="2025" required></div>
+          </div>
+          <button id="apply" class="primary" type="submit">Explore data <span aria-hidden="true">→</span></button>
+          <button id="cancel" type="button" hidden>Cancel request</button>
+        </form>
+        <p class="catalog-note" id="catalog-note"></p>
+        <button id="refresh-catalog" type="button" class="text-button">Refresh this database’s indicators</button>
+      </aside>
+      <section id="results" class="results" aria-labelledby="indicator-title" aria-busy="true">
+        <div id="status" class="status" role="status" aria-live="polite">Loading the indicator catalog…</div>
+        <div id="error" class="error" role="alert" hidden></div>
+        <button id="saved-example" type="button">Load a saved World Bank example</button>
+        <div id="result-content" hidden>
+          <div class="result-heading">
+            <div><p class="eyebrow" id="source-label"></p><h2 id="indicator-title"></h2><p id="indicator-code" class="muted"></p></div>
+            <button id="download" type="button">Download CSV ↓</button>
+          </div>
+          <p id="definition" class="definition"></p>
+          <div class="summary" id="summary"></div>
+          <div class="chart-header"><h3>Change over time</h3><div id="legend" class="legend"></div></div>
+          <div id="chart" class="chart"></div>
+          <p class="chart-note">Gaps indicate missing observations. Percentages follow each indicator’s definition and may exceed 100.</p>
+          <div class="table-heading"><h3 id="table-title">Latest available in this period</h3><label class="checkbox-label"><input id="all-observations" type="checkbox"> Show every observation</label></div>
+          <div class="table-scroll"><table><thead><tr><th scope="col">Country</th><th scope="col">Year</th><th scope="col">Value</th></tr></thead><tbody id="table-body"></tbody></table></div>
+          <p id="missing-note" class="chart-note"></p>
+          <details class="provenance"><summary>Source and request details</summary><p id="producer"></p><p id="retrieved"></p><ul id="request-links"></ul></details>
+        </div>
+      </section>
+    </div>
+    <noscript>This interactive explorer needs JavaScript enabled. You can also browse the source data at data.worldbank.org.</noscript>
+  </main>
+  <footer><p>An independent explorer of World Bank data. Education is the initial focus.</p><a href="https://datahelpdesk.worldbank.org/knowledgebase/topics/125589-developer-information" target="_blank" rel="noreferrer">API documentation ↗</a></footer>
+</body>
+</html>

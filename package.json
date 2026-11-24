@@ -1,0 +1,13 @@
+{
+  "name": "world-bank-comprehensive-data-review",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "An interactive World Bank data explorer for GitHub Pages.",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check web/app.mjs && node --check web/world-bank.mjs && node --check scripts/serve.mjs"
+  },
+  "engines": {"node": ">=20"}
+}
