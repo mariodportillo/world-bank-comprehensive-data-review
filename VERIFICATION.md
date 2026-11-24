@@ -13,4 +13,4 @@ Checked locally on November 24, 2026.
 - The page had no horizontal overflow at the browser's observed 752-pixel content width.
 - The CSV serialization checks passed. Browser download automation was interrupted, so the native file-save flow has not been independently verified.
 
-Public repository creation and GitHub Pages publication require the explicit public-visibility approval requested in the chat. Local source and screenshots do not establish that the site is published.
+The user chose to keep the website local on November 24, 2026. No public repository or GitHub Pages deployment was created. The local repository includes the Pages workflow for a later publication decision.
