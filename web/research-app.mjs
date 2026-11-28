@@ -1,5 +1,7 @@
 import {QUESTIONS, DEFAULTS, readState, compare, indexMetric, analyticalCSV} from './analysis.mjs';
 import {createWorldBankClient} from './world-bank.mjs';
+import {createStory} from './story.mjs';
+import {createArchive} from './notebook-archive.mjs';
 
 const $=id=>document.getElementById(id);
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -7,7 +9,7 @@ const fmt=(value,digits=2)=>value===null||value===undefined?'—':Number(value).
 const date=value=>new Date(value).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'});
 const period=years=>years.length===1?String(years[0]):`${years[0]}–${years.at(-1)}`;
 const client=createWorldBankClient({perPage:10000});
-let data,state,result,notebook,controller,live=false,metadataDate;
+let data,state,result,notebook,story,controller,live=false,metadataDate;
 const titles={youth:'The high-literacy end of the picture.',adult:'A closer look at the literacy gap.',noSchool:'Investment alongside unmet need.'};
 const rankingTitles={youth:'Highest youth literacy',adult:'Lowest adult literacy',noSchool:'Above both thresholds'};
 const metricDescriptions={
@@ -17,7 +19,7 @@ const metricDescriptions={
   noSchool:'The share of people ages 15+ with no formal education. A historical attainment series, distinct from literacy.'
 };
 function explorerLink(metric){return `./explorer.html#${new URLSearchParams({source:metric.sourceId,indicator:metric.code,countries:'MEX,CAN',start:1990,end:2025})}`;}
-function status(){ $('story-data-status').textContent=`${live?'Observations refreshed from the API':'API snapshot retrieved'} ${date(data.retrievedAt)} · Story window: 2000–2025 · Country averages use matched reporting years.`; $('data-status').textContent=`${live?'API refreshed':'Saved API snapshot'} · ${date(data.retrievedAt)} · ${Object.values(data.metrics).reduce((n,m)=>n+m.rows.length,0).toLocaleString()} non-missing observations`; }
+function status(){ $('data-status').textContent=`${live?'API refreshed':'Saved API snapshot'} · ${date(data.retrievedAt)} · ${Object.values(data.metrics).reduce((n,m)=>n+m.rows.length,0).toLocaleString()} non-missing observations`; }
 function syncControls(){
   for(const key of ['mode','start','end','year','minYears','region','spending','noSchool'])$(key).value=state[key];
   const single=state.mode==='year';
@@ -27,7 +29,7 @@ function syncControls(){
   $('spending').disabled=$('noSchool').disabled=state.question!=='noSchool';
   document.querySelectorAll('[data-question]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.question===state.question)));
 }
-function saveState(){history.replaceState(null,'',`${location.pathname}?${new URLSearchParams(state)}#comparison`);}
+function saveState(){const params=new URLSearchParams(location.search);for(const [key,value] of Object.entries(state))params.set(key,value);history.replaceState(null,'',`${location.pathname}?${params}#comparison`);}
 function render(persist=true){
   result=compare(data,state);
   const q=QUESTIONS[state.question],metric=data.metrics[q.metric];
@@ -154,62 +156,18 @@ async function refresh(){
     status();$('error').hidden=false;$('error').textContent=controller.signal.aborted?'Refresh canceled. The previous extract remains visible.':`Could not complete the API refresh. The previous extract remains visible. ${error.message}`;
   }finally{$('refresh').disabled=false;$('cancel').hidden=true;controller=null;}
 }
-const storySelections={youth:'MEX',adult:'TCD',noSchool:'MOZ'};
-const storyResults={};
-function renderStory(only){
-  for(const question of only?[only]:['youth','adult','noSchool']){
-    const storyState={...DEFAULTS,question,spending:Number($('story-spending').value),noSchool:Number($('story-schooling').value)};
-    const summary=compare(data,storyState);storyResults[question]=summary;
-    if(!summary.rows.some(r=>r.id===storySelections[question]))storySelections[question]=summary.featured[0]?.id??summary.rows[0]?.id;
-    const selected=summary.rows.find(r=>r.id===storySelections[question]);
-    if(question==='youth'){
-      const min=Math.min(...summary.featured.map(r=>r.x)),max=Math.max(...summary.featured.map(r=>r.x));
-      const one=summary.featured.filter(r=>r.n===1).length;
-      $('story-youth-countries').innerHTML=summary.featured.map(r=>`<button type="button" data-story-country="${r.id}" data-story-question="youth" aria-pressed="${r.id===storySelections.youth}">${escape(r.name)}</button>`).join('');
-      $('story-youth-finding').textContent=`Among ${summary.rows.length} eligible countries, the five highest literacy averages span spending of ${fmt(min)}–${fmt(max)}% of GDP. ${one} of those five have just one matched year. Across all eligible countries, Pearson r = ${fmt(summary.r,3)}.`;
-    }else if(question==='adult'){
-      const low=summary.featured[0];
-      $('story-adult-finding').textContent=low?`${low.name} has the lowest matched-period average in this sample: ${fmt(low.y)}% adult literacy, paired with ${fmt(low.x)}% of GDP in education spending across ${low.n} reporting years. ${summary.rows.length} countries have enough data to compare.`:'No matched observations are available in this extract.';
-    }else{
-      $('story-spending-value').textContent=fmt(storyState.spending,storyState.spending%1?1:0);$('story-schooling-value').textContent=fmt(storyState.noSchool,0);
-      $('story-noSchool-finding').textContent=`${summary.featured.length} of ${summary.rows.length} eligible countries exceed both thresholds: spending above ${fmt(storyState.spending,1)}% of GDP and no schooling above ${fmt(storyState.noSchool,0)}%. Their averages use matching reporting years within 2000–${Math.min(2025,data.metrics.noSchool.lastYear)}.`;
-    }
-    const target=$(`story-${question}-chart`),W=Math.max(360,Math.min(700,target.clientWidth||600));
-    if(question==='adult'){
-      const H=374,L=145,R=39,T=29,B=25,pw=W-L-R,rowH=30;
-      let svg=`<svg viewBox="0 0 ${W} ${H}" role="group" aria-label="Bottom ten adult literacy averages, 2000–2025. Select a country bar with Enter or Space.">`;
-      for(const v of [0,25,50,75,100])svg+=`<line x1="${L+v/100*pw}" y1="${T-5}" x2="${L+v/100*pw}" y2="${T+300}" stroke="#e0e5dc"/>`+axisText(L+v/100*pw,H-13,`${v}%`,'text-anchor="middle"');
-      summary.featured.forEach((r,i)=>{const y=T+i*rowH,active=r.id===storySelections[question];svg+=`<g data-story-country="${escape(r.id)}" data-story-question="adult" role="button" tabindex="0" class="story-bar" aria-pressed="${active}" aria-label="${escape(storyLabel(r,question))}"><title>${escape(storyLabel(r,question))}</title><rect x="0" y="${y-4}" width="${W}" height="29" fill="${active?'#eaf0e6':'transparent'}"/><rect x="${L}" y="${y+2}" width="${r.y/100*pw}" height="13" fill="${active?'#203f3b':'#b74d34'}"/>${axisText(L-9,y+13,r.name.length>23?r.name.slice(0,21)+'…':r.name,'text-anchor="end" class="story-country-name"')}${axisText(L+r.y/100*pw+6,y+13,fmt(r.y,1),'class="story-country-name"')}</g>`;});
-      target.innerHTML=svg+'</svg>';
-    }else{
-      const H=340,L=45,R=17,T=29,B=47,pw=W-L-R,ph=H-T-B;
-      const xmax=Math.max(16,Math.ceil(Math.max(...summary.rows.map(r=>r.x))/4)*4),x=v=>L+v/xmax*pw,y=v=>T+ph-v/100*ph;
-      const featured=new Set(summary.featured.map(r=>r.id));
-      let svg=`<svg viewBox="0 0 ${W} ${H}" role="group" aria-label="Spending versus ${question==='youth'?'youth literacy':'no schooling'}, matched-year averages in 2000–2025. Select a dot with Enter or Space.">`;
-      if(question==='noSchool')svg+=`<rect x="${x(storyState.spending)}" y="${T}" width="${W-R-x(storyState.spending)}" height="${y(storyState.noSchool)-T}" fill="#f3e8dd"/>`;
-      for(const n of [0,25,50,75,100])svg+=`<line x1="${L}" y1="${y(n)}" x2="${W-R}" y2="${y(n)}" stroke="#dde2d9"/>`+axisText(L-10,y(n)+3,n,'text-anchor="end"');
-      for(let i=0;i<=4;i++){const n=xmax*i/4;svg+=axisText(x(n),H-B+21,fmt(n,0),'text-anchor="middle"');}
-      svg+=axisText(L,13,`${data.metrics[QUESTIONS[question].metric].label} (%)`)+axisText(L+pw/2,H-4,'Education spending (% of GDP)','text-anchor="middle"');
-      if(question==='noSchool')svg+=`<path d="M ${x(storyState.spending)} ${T} V ${y(0)} M ${L} ${y(storyState.noSchool)} H ${W-R}" stroke="#b74d34" stroke-dasharray="4 4" fill="none"/>`;
-      const rows=[...summary.rows].sort((a,b)=>Number(featured.has(a.id))-Number(featured.has(b.id))||Number(a.id===storySelections[question])-Number(b.id===storySelections[question]));
-      for(const r of rows){const active=r.id===storySelections[question];svg+=`<circle class="chart-point" data-story-country="${r.id}" data-story-question="${question}" cx="${x(r.x)}" cy="${y(r.y)}" r="${active?6:featured.has(r.id)?4.5:3.5}" fill="${featured.has(r.id)?'#b74d34':'#387d70'}" fill-opacity="${featured.has(r.id)||active?1:.5}" stroke="${active?'#203f3b':'#fcfcf8'}" stroke-width="${active?2:.7}" role="button" tabindex="0" aria-pressed="${active}" aria-label="${escape(storyLabel(r,question))}"><title>${escape(storyLabel(r,question))}</title></circle>`;}
-      if(selected)svg+=`<text x="${Math.max(L+15,Math.min(W-R-15,x(selected.x)))}" y="${Math.max(T+12,y(selected.y)-12)}" text-anchor="middle" font-size="11" fill="#203f3b" stroke="#fcfcf8" stroke-width="3" paint-order="stroke" pointer-events="none">${selected.id}</text>`;
-      target.innerHTML=svg+'</svg>';
-    }
-    $(`story-${question}-readout`).textContent=selected?storyLabel(selected,question):'No countries with matching observations.';
-    const follow=document.querySelector(`[data-follow="${question}"]`);follow.disabled=!selected;follow.textContent=selected?`Follow ${selected.name}’s history →`:'No country selected';
-  }
-}
-function storyLabel(r,question){return `${r.name} · Spending ${fmt(r.x)}% GDP · ${data.metrics[QUESTIONS[question].metric].label} ${fmt(r.y)}% · Matched years: ${r.years.join(', ')}`;}
-function openComparison(question,follow){
-  state={...DEFAULTS,question,country:storySelections[question]??'MEX',spending:Number($('story-spending').value),noSchool:Number($('story-schooling').value)};
+function renderStory(){story?.render();}
+function openComparison(question,country,options,follow){
+  state={...DEFAULTS,question,country:country??'MEX',spending:options.spending,noSchool:options.noSchool};
   $('deep-dive').open=true;$('country-search').value='';$('show-all').checked=false;render();
   (follow?document.querySelector('.country-panel'):$('comparison')).scrollIntoView({behavior:'smooth',block:'start'});
 }
 async function init(){
   try{
-    const response=await fetch('./data/research.json');if(!response.ok)throw new Error(`Snapshot HTTP ${response.status}`);
-    data=await response.json();metadataDate=data.metadataRetrievedAt??data.retrievedAt;state=readState(location.search||location.hash,data);
+    const [apiPayload,notebookPayload,archive]=await Promise.all(['research.json','notebook-findings.json','notebook-archive.json'].map(async name=>{const response=await fetch(`./data/${name}`);if(!response.ok)throw new Error(`${name}: HTTP ${response.status}`);return response.json();}));
+    data=apiPayload;notebook=notebookPayload;metadataDate=data.metadataRetrievedAt??data.retrievedAt;state=readState(location.search||location.hash,data);
+    story=createStory({getData:()=>data,notebook,onInspect:openComparison});createArchive(archive);
+    $('notebook-provenance').textContent=notebook.provenance;historicalTable();$('notebook-question').addEventListener('change',historicalTable);
     const regions=[...new Map(data.countries.map(c=>[c.regionId,c.region.trim()])).entries()].sort((a,b)=>a[1].localeCompare(b[1]));
     $('region').insertAdjacentHTML('beforeend',regions.map(([id,name])=>`<option value="${escape(id)}">${escape(name)}</option>`).join(''));
     $('country-select').innerHTML=[...data.countries].sort((a,b)=>a.name.localeCompare(b.name)).map(c=>`<option value="${escape(c.id)}">${escape(c.name)}</option>`).join('');
@@ -228,21 +186,10 @@ async function init(){
     $('refresh').addEventListener('click',refresh);$('cancel').addEventListener('click',()=>controller?.abort(new DOMException('User canceled','AbortError')));
     $('export').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([analyticalCSV(result,state,data)],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=`world-bank-${state.question}-${result.start}-${result.end}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
     window.addEventListener('hashchange',()=>{if(location.hash.includes('=')){state=readState(location.hash,data);$('deep-dive').open=true;render(false);}});
-    window.addEventListener('popstate',()=>{state=readState(location.search||location.hash,data);render(false);});
-    $('story-youth-countries').addEventListener('click',e=>{const button=e.target.closest('[data-story-country]');if(button){const id=button.dataset.storyCountry;storySelections.youth=id;renderStory('youth');$('story-youth-countries').querySelector(`[data-story-country="${id}"]`)?.focus({preventScroll:true});}});
-    for(const id of ['story-spending','story-schooling'])$(id).addEventListener('input',()=>renderStory('noSchool'));
-    document.querySelectorAll('[data-investigate]').forEach(button=>button.addEventListener('click',()=>openComparison(button.dataset.investigate,false)));
-    document.querySelectorAll('[data-follow]').forEach(button=>button.addEventListener('click',()=>openComparison(button.dataset.follow,true)));
-    for(const question of ['youth','adult','noSchool']){
-      const chart=$(`story-${question}-chart`);
-      const choose=e=>{const point=e.target.closest('[data-story-country]');if(!point)return;if(e.type==='keydown'&&!['Enter',' '].includes(e.key))return;e.preventDefault();storySelections[question]=point.dataset.storyCountry;renderStory(question);if(e.type==='keydown')chart.querySelector(`[data-story-country="${storySelections[question]}"]`)?.focus({preventScroll:true});};
-      chart.addEventListener('click',choose);chart.addEventListener('keydown',choose);
-      chart.addEventListener('pointerleave',()=>{const row=storyResults[question].rows.find(r=>r.id===storySelections[question]);if(row)$(`story-${question}-readout`).textContent=storyLabel(row,question);});
-      for(const type of ['pointerover','focusin'])chart.addEventListener(type,e=>{const point=e.target.closest('[data-story-country]');if(point){const row=storyResults[question].rows.find(r=>r.id===point.dataset.storyCountry);$(`story-${question}-readout`).textContent=storyLabel(row,question);}});
-    }
+    window.addEventListener('popstate',()=>{state=readState(location.search||location.hash,data);story?.restore();render(false);});
     $('deep-dive').addEventListener('toggle',()=>{if($('deep-dive').open){renderScatter();renderTrend();}});
     let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{renderStory();if($('deep-dive').open){renderScatter();renderTrend();}},150);});
-    const historical=await fetch('./data/notebook-findings.json');if(!historical.ok)throw new Error('Notebook results could not be loaded');notebook=await historical.json();$('notebook-provenance').textContent=notebook.provenance;historicalTable();$('notebook-question').addEventListener('change',historicalTable);
+
   }catch(error){$('deep-dive').open=true;$('story-data-status').textContent='The saved extract could not be loaded. Reload the page or use the indicator library.';$('error').hidden=false;$('error').textContent=`Could not initialize the research view: ${error.message}`;$('dashboard').setAttribute('aria-busy','false');}
 }
 init();

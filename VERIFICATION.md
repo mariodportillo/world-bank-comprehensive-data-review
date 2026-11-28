@@ -1,5 +1,19 @@
 # Verification
 
+## Notebook findings and CS448B article revision — November 28, 2026
+
+- All 32 automated tests and JavaScript syntax checks pass. Both Python scripts pass syntax checks.
+- The default article now uses the exact saved notebook outputs. Browser checks confirmed Uzbekistan 99.98% youth literacy / 5.95% GDP spending, Somalia 5.40% adult literacy / 1.23% GDP spending, correlations 0.3079 (192 countries) and 0.3005 (194), and all 35 threshold rows. The five and ten saved spending averages produce 4.700% and 2.369% respectively.
+- Full-sample correlations are read from the saved query outputs, not recalculated from the short ranked subsets. The missing full-sample inputs and unknown notebook extraction/year coverage are disclosed.
+- Switching the article to API mode changed youth correlation to approximately 0.2598 with 147 eligible countries and the threshold view to 21 matches among 124. Switching back restored the 35 saved notebook rows. API history is explicitly labeled as a different analysis when opening a notebook country.
+- The main article now uses three distinct forms: a scatterplot, reorderable bar chart and country-by-indicator heatmap. The youth axis toggled between 99.8–100% and the full 0–100%. Reordering the adult cohort by spending put Burkina Faso first without changing the ten countries. Sorting the notebook heatmap by spending put Zimbabwe first at 9.05% GDP.
+- Raising the notebook spending cutoff from 4% to 4.5% changed matches from 35 to 26. Searching for Mexico produced no passing row at that cutoff; showing all saved rows exposed Mexico’s exact 4.27 / 18.44 / 92.46 values and a below-cutoff label. No new countries were invented when cutoffs were lowered.
+- All 26 saved result tables (884 rows) were extracted without executing notebook code. Automated checks match the five core archived outputs against the existing findings file. Both RANK and ROW_NUMBER outputs, the 35-row main result and the later ten-row example are retained.
+- Browser checks confirmed 35 archived rows for cell 71, the zero-row duplicate-key result for cell 20, and the correct ROW_NUMBER SQL after opening its disclosure. SQL is displayed as inert text and is never executed.
+- Comparison bookmarks retain both story source/threshold/sort settings and API country/year settings. Selecting Uzbekistan from the notebook opens the labeled API workspace with that country selected.
+- Desktop checks at 1280 pixels and phone-sized checks at 390 pixels showed no page overflow. The mobile heatmap fit its container (321 pixels) without hidden horizontal columns; controls and exact values were visually inspected. The viewport override was reset afterward. CSV serialization preserves original decimal strings, SQL-result columns and country names; native file-save behavior remains outside the independently verified checks.
+- The linked CS448B brief was reviewed directly. The website implements its visual-explainer direction and three-chart interaction requirement. Novelty review, the short video and course submission remain separate work.
+
 ## Guided narrative revision — November 28, 2026
 
 - JavaScript syntax checks and all 23 automated tests pass with Node.js 20.14.0. The Python snapshot script also passes a syntax check.
