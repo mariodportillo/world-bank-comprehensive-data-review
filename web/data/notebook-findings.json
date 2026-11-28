@@ -1,0 +1,358 @@
+{
+  "provenance": "Saved outputs in Mario Portillo’s CS145 Project 1 notebook; historical BigQuery public World Bank tables. Each series was averaged independently across all available years. Original extract date and full year ranges are not recorded in the result tables. Values are the notebook’s rounded outputs, not a fresh query.",
+  "tables": {
+    "youth": [
+      {
+        "country_name": "Uzbekistan",
+        "country_code": "UZB",
+        "avg_literacy_rate": "99.98",
+        "avg_GDP_spend": "5.95"
+      },
+      {
+        "country_name": "Korea, Rep.",
+        "country_code": "KOR",
+        "avg_literacy_rate": "99.95",
+        "avg_GDP_spend": "3.47"
+      },
+      {
+        "country_name": "Azerbaijan",
+        "country_code": "AZE",
+        "avg_literacy_rate": "99.94",
+        "avg_GDP_spend": "3.09"
+      },
+      {
+        "country_name": "Ukraine",
+        "country_code": "UKR",
+        "avg_literacy_rate": "99.89",
+        "avg_GDP_spend": "5.63"
+      },
+      {
+        "country_name": "Barbados",
+        "country_code": "BRB",
+        "avg_literacy_rate": "99.87",
+        "avg_GDP_spend": "5.36"
+      }
+    ],
+    "youthCorrelation": [
+      {
+        "countries_compared": "192",
+        "pearson_r": "0.3079"
+      }
+    ],
+    "adult": [
+      {
+        "country_name": "Somalia",
+        "country_code": "SOM",
+        "avg_literacy_rate": "5.40",
+        "avg_GDP_spend": "1.23"
+      },
+      {
+        "country_name": "Chad",
+        "country_code": "TCD",
+        "avg_literacy_rate": "22.65",
+        "avg_GDP_spend": "2.31"
+      },
+      {
+        "country_name": "Burkina Faso",
+        "country_code": "BFA",
+        "avg_literacy_rate": "22.81",
+        "avg_GDP_spend": "3.43"
+      },
+      {
+        "country_name": "Mali",
+        "country_code": "MLI",
+        "avg_literacy_rate": "24.08",
+        "avg_GDP_spend": "3.34"
+      },
+      {
+        "country_name": "Afghanistan",
+        "country_code": "AFG",
+        "avg_literacy_rate": "24.80",
+        "avg_GDP_spend": "2.52"
+      },
+      {
+        "country_name": "Niger",
+        "country_code": "NER",
+        "avg_literacy_rate": "27.16",
+        "avg_GDP_spend": "2.76"
+      },
+      {
+        "country_name": "Guinea",
+        "country_code": "GIN",
+        "avg_literacy_rate": "29.44",
+        "avg_GDP_spend": "2.24"
+      },
+      {
+        "country_name": "Benin",
+        "country_code": "BEN",
+        "avg_literacy_rate": "30.40",
+        "avg_GDP_spend": "2.87"
+      },
+      {
+        "country_name": "South Sudan",
+        "country_code": "SSD",
+        "avg_literacy_rate": "30.68",
+        "avg_GDP_spend": "1.25"
+      },
+      {
+        "country_name": "Central African Republic",
+        "country_code": "CAF",
+        "avg_literacy_rate": "35.33",
+        "avg_GDP_spend": "1.74"
+      }
+    ],
+    "adultCorrelation": [
+      {
+        "countries_compared": "194",
+        "pearson_r": "0.3005"
+      }
+    ],
+    "noSchool": [
+      {
+        "country_name": "Yemen, Rep.",
+        "country_code": "YEM",
+        "avg_15_plus_no_education_percent": "82.22",
+        "avg_GDP_spend": "8.01",
+        "avg_literacy_rate": "45.59"
+      },
+      {
+        "country_name": "Mozambique",
+        "country_code": "MOZ",
+        "avg_15_plus_no_education_percent": "74.28",
+        "avg_GDP_spend": "5.05",
+        "avg_literacy_rate": "46.86"
+      },
+      {
+        "country_name": "Burundi",
+        "country_code": "BDI",
+        "avg_15_plus_no_education_percent": "67.68",
+        "avg_GDP_spend": "4.57",
+        "avg_literacy_rate": "49.53"
+      },
+      {
+        "country_name": "Morocco",
+        "country_code": "MAR",
+        "avg_15_plus_no_education_percent": "65.48",
+        "avg_GDP_spend": "5.25",
+        "avg_literacy_rate": "57.92"
+      },
+      {
+        "country_name": "Cote d'Ivoire",
+        "country_code": "CIV",
+        "avg_15_plus_no_education_percent": "62.76",
+        "avg_GDP_spend": "4.89",
+        "avg_literacy_rate": "49.00"
+      },
+      {
+        "country_name": "Senegal",
+        "country_code": "SEN",
+        "avg_15_plus_no_education_percent": "58.66",
+        "avg_GDP_spend": "4.13",
+        "avg_literacy_rate": "43.33"
+      },
+      {
+        "country_name": "Papua New Guinea",
+        "country_code": "PNG",
+        "avg_15_plus_no_education_percent": "56.21",
+        "avg_GDP_spend": "4.12",
+        "avg_literacy_rate": "59.47"
+      },
+      {
+        "country_name": "Togo",
+        "country_code": "TGO",
+        "avg_15_plus_no_education_percent": "55.42",
+        "avg_GDP_spend": "4.20",
+        "avg_literacy_rate": "59.64"
+      },
+      {
+        "country_name": "Egypt, Arab Rep.",
+        "country_code": "EGY",
+        "avg_15_plus_no_education_percent": "53.84",
+        "avg_GDP_spend": "4.43",
+        "avg_literacy_rate": "62.38"
+      },
+      {
+        "country_name": "Tunisia",
+        "country_code": "TUN",
+        "avg_15_plus_no_education_percent": "44.98",
+        "avg_GDP_spend": "6.21",
+        "avg_literacy_rate": "74.43"
+      },
+      {
+        "country_name": "Ghana",
+        "country_code": "GHA",
+        "avg_15_plus_no_education_percent": "43.75",
+        "avg_GDP_spend": "4.73",
+        "avg_literacy_rate": "69.48"
+      },
+      {
+        "country_name": "Algeria",
+        "country_code": "DZA",
+        "avg_15_plus_no_education_percent": "43.37",
+        "avg_GDP_spend": "6.28",
+        "avg_literacy_rate": "69.74"
+      },
+      {
+        "country_name": "Congo, Rep.",
+        "country_code": "COG",
+        "avg_15_plus_no_education_percent": "41.77",
+        "avg_GDP_spend": "4.77",
+        "avg_literacy_rate": "73.84"
+      },
+      {
+        "country_name": "Swaziland",
+        "country_code": "SWZ",
+        "avg_15_plus_no_education_percent": "39.58",
+        "avg_GDP_spend": "5.68",
+        "avg_literacy_rate": "75.15"
+      },
+      {
+        "country_name": "Kenya",
+        "country_code": "KEN",
+        "avg_15_plus_no_education_percent": "35.83",
+        "avg_GDP_spend": "5.59",
+        "avg_literacy_rate": "78.66"
+      },
+      {
+        "country_name": "Kuwait",
+        "country_code": "KWT",
+        "avg_15_plus_no_education_percent": "35.04",
+        "avg_GDP_spend": "4.92",
+        "avg_literacy_rate": "88.26"
+      },
+      {
+        "country_name": "Maldives",
+        "country_code": "MDV",
+        "avg_15_plus_no_education_percent": "33.96",
+        "avg_GDP_spend": "4.19",
+        "avg_literacy_rate": "94.52"
+      },
+      {
+        "country_name": "Saudi Arabia",
+        "country_code": "SAU",
+        "avg_15_plus_no_education_percent": "32.52",
+        "avg_GDP_spend": "5.96",
+        "avg_literacy_rate": "86.73"
+      },
+      {
+        "country_name": "Jordan",
+        "country_code": "JOR",
+        "avg_15_plus_no_education_percent": "32.29",
+        "avg_GDP_spend": "4.05",
+        "avg_literacy_rate": "90.57"
+      },
+      {
+        "country_name": "Botswana",
+        "country_code": "BWA",
+        "avg_15_plus_no_education_percent": "31.20",
+        "avg_GDP_spend": "6.25",
+        "avg_literacy_rate": "78.86"
+      },
+      {
+        "country_name": "Syrian Arab Republic",
+        "country_code": "SYR",
+        "avg_15_plus_no_education_percent": "30.19",
+        "avg_GDP_spend": "4.96",
+        "avg_literacy_rate": "73.13"
+      },
+      {
+        "country_name": "Namibia",
+        "country_code": "NAM",
+        "avg_15_plus_no_education_percent": "28.05",
+        "avg_GDP_spend": "7.93",
+        "avg_literacy_rate": "83.41"
+      },
+      {
+        "country_name": "Honduras",
+        "country_code": "HND",
+        "avg_15_plus_no_education_percent": "25.70",
+        "avg_GDP_spend": "4.60",
+        "avg_literacy_rate": "85.83"
+      },
+      {
+        "country_name": "Brazil",
+        "country_code": "BRA",
+        "avg_15_plus_no_education_percent": "21.91",
+        "avg_GDP_spend": "5.13",
+        "avg_literacy_rate": "89.81"
+      },
+      {
+        "country_name": "Lesotho",
+        "country_code": "LSO",
+        "avg_15_plus_no_education_percent": "20.72",
+        "avg_GDP_spend": "8.21",
+        "avg_literacy_rate": "79.56"
+      },
+      {
+        "country_name": "Malaysia",
+        "country_code": "MYS",
+        "avg_15_plus_no_education_percent": "19.22",
+        "avg_GDP_spend": "5.48",
+        "avg_literacy_rate": "89.25"
+      },
+      {
+        "country_name": "Mexico",
+        "country_code": "MEX",
+        "avg_15_plus_no_education_percent": "18.44",
+        "avg_GDP_spend": "4.27",
+        "avg_literacy_rate": "92.46"
+      },
+      {
+        "country_name": "South Africa",
+        "country_code": "ZAF",
+        "avg_15_plus_no_education_percent": "18.14",
+        "avg_GDP_spend": "5.57",
+        "avg_literacy_rate": "90.05"
+      },
+      {
+        "country_name": "Portugal",
+        "country_code": "PRT",
+        "avg_15_plus_no_education_percent": "18.11",
+        "avg_GDP_spend": "4.18",
+        "avg_literacy_rate": "89.50"
+      },
+      {
+        "country_name": "Venezuela, RB",
+        "country_code": "VEN",
+        "avg_15_plus_no_education_percent": "17.62",
+        "avg_GDP_spend": "4.09",
+        "avg_literacy_rate": "93.34"
+      },
+      {
+        "country_name": "Vietnam",
+        "country_code": "VNM",
+        "avg_15_plus_no_education_percent": "17.42",
+        "avg_GDP_spend": "4.72",
+        "avg_literacy_rate": "90.19"
+      },
+      {
+        "country_name": "Zimbabwe",
+        "country_code": "ZWE",
+        "avg_15_plus_no_education_percent": "17.06",
+        "avg_GDP_spend": "9.05",
+        "avg_literacy_rate": "83.40"
+      },
+      {
+        "country_name": "Malta",
+        "country_code": "MLT",
+        "avg_15_plus_no_education_percent": "15.48",
+        "avg_GDP_spend": "4.56",
+        "avg_literacy_rate": "90.99"
+      },
+      {
+        "country_name": "Moldova",
+        "country_code": "MDA",
+        "avg_15_plus_no_education_percent": "12.07",
+        "avg_GDP_spend": "6.58",
+        "avg_literacy_rate": "97.46"
+      },
+      {
+        "country_name": "Mongolia",
+        "country_code": "MNG",
+        "avg_15_plus_no_education_percent": "11.59",
+        "avg_GDP_spend": "5.01",
+        "avg_literacy_rate": "98.41"
+      }
+    ]
+  }
+}
