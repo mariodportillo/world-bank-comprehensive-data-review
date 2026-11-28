@@ -164,9 +164,9 @@ function openComparison(question,country,options,follow){
 }
 async function init(){
   try{
-    const [apiPayload,notebookPayload,archive]=await Promise.all(['research.json','notebook-findings.json','notebook-archive.json'].map(async name=>{const response=await fetch(`./data/${name}`);if(!response.ok)throw new Error(`${name}: HTTP ${response.status}`);return response.json();}));
+    const [apiPayload,notebookPayload,archive,world]=await Promise.all(['research.json','notebook-findings.json','notebook-archive.json','world-map.json'].map(async name=>{const response=await fetch(`./data/${name}`);if(!response.ok)throw new Error(`${name}: HTTP ${response.status}`);return response.json();}));
     data=apiPayload;notebook=notebookPayload;metadataDate=data.metadataRetrievedAt??data.retrievedAt;state=readState(location.search||location.hash,data);
-    story=createStory({getData:()=>data,notebook,onInspect:openComparison});createArchive(archive);
+    story=createStory({getData:()=>data,notebook,onInspect:openComparison,world});createArchive(archive);
     $('notebook-provenance').textContent=notebook.provenance;historicalTable();$('notebook-question').addEventListener('change',historicalTable);
     const regions=[...new Map(data.countries.map(c=>[c.regionId,c.region.trim()])).entries()].sort((a,b)=>a[1].localeCompare(b[1]));
     $('region').insertAdjacentHTML('beforeend',regions.map(([id,name])=>`<option value="${escape(id)}">${escape(name)}</option>`).join(''));

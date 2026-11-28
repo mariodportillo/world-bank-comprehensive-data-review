@@ -1,5 +1,19 @@
 # Verification
 
+## Interactive geographic view — November 28, 2026
+
+- All 40 automated checks and JavaScript syntax checks pass. The Python preparation script passes a syntax check.
+- The locally bundled, pinned Natural Earth basemap has 176 non-Antarctic polygon features plus 42 World Bank capital locator points, covering 212 World Bank country/economy codes. Geometry coordinates and paths are finite, identifiers are unique by source feature and explicit Kosovo/France/Norway mappings are tested.
+- Every saved notebook country is located. The default 35-country map has 33 outlines and 2 capital locators (Maldives and Malta). The five-country youth result has 4 outlines and a Barbados locator. Every eligible API country in the current three samples also has a location.
+- The browser loaded the original notebook map with 35 colored countries. Country values preserved Yemen’s 8.01% spending, 82.22% no schooling and 45.59% adult literacy. Switching to the API schooling comparison showed 21 colored matches among 124 rows; missing adult context is hatched when that measure is selected.
+- Raising spending from 4% to 4.5% colored 26 notebook matches and muted 9 rows. The schooling chapter’s count and slider updated with the map. Source controls in either location update the same story basis.
+- Selected Barbados’s locator using keyboard Enter; both the map detail and youth chapter retained 99.87% literacy / 5.36% GDP spending. Country focus reached 8× zoom. The navigation buttons, reset and an actual pointer drag changed the viewport within bounds without changing the selected country.
+- Region filtering and country-name search found Ghana in the API schooling group. The optional adult-literacy context was 71.50% from 2010 alone, while the spending–schooling pair used 2005 and 2010. The map hover/detail labels retain this distinction.
+- The map’s history button opened Yemen in the explicitly labeled API workspace. Reloading a map bookmark restored the selected country, group, measure and region.
+- No browser console errors or warnings during completed interactions. No horizontal page overflow at observed 1280-pixel desktop or temporary 390-pixel mobile widths. On mobile, the map/finder stacked vertically, the Barbados marker and country label remained readable and focus controls worked. The temporary viewport override was reset.
+- Map values distinguish actual zero, missing context, below-cutoff rows and countries outside the selected result. Tests also cover invalid URL settings, unmapped-row reporting, region filters and the 1–8× pan/zoom limits.
+- The map is served from local static assets, with source URLs, pinned revision, preparation time and credits. No runtime tile service or API key is used.
+
 ## Notebook findings and CS448B article revision — November 28, 2026
 
 - All 32 automated tests and JavaScript syntax checks pass. Both Python scripts pass syntax checks.

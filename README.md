@@ -27,6 +27,24 @@ Select countries in the scatterplot or top-five buttons, toggle the magnified/fu
 
 The original general explorer remains at `web/explorer.html`, linked as **Indicator library**. It contains 12,537 definitions across EdStats, WDI, Gender Statistics, Education Policy, Human Capital Index and historical Global Partnership for Education. Those are full catalogs of selected databases, including contextual measures; they are not an exhaustive inventory of every World Bank product. That catalog was retrieved October 29, 2026 and can be refreshed per database in the browser.
 
+## Geographic view
+
+The **Map** section is a fourth, linked visualization. It defaults to the notebook’s complete 35-country spending/no-schooling result. The map and article share the notebook/API source switch and threshold settings. Select a different country group to map the youth top five or adult bottom ten; API mode uses the full eligible sample for that question. Change the color measure between the selected outcome, spending as % GDP, and (for the schooling group) adult-literacy context.
+
+Use the region filter, country-name/code finder, keyboard-selectable country shapes, zoom/pan buttons, drag-to-pan, reset, and **Zoom to this country**. Selection updates the corresponding article chapter. **Compare with API history** opens the separately labeled analytical workspace for that country. Map group, metric, region, selected country and cutoff-muting settings are recorded in the URL alongside the story settings. Regions follow the saved World Bank country catalog.
+
+Colors use fixed, labeled bins: outcome/context percentages in 20-point bands, and spending in 2-point GDP bands (last bin 8%+). The darkest shade means a higher value, not better educational performance. Gray means outside the selected result/region; pale peach means below the current cutoffs; hatching means no reported value for the selected measure. Reported zero receives the lowest data color. Optional adult-literacy context retains its own reporting years when only some spending–schooling pair years have literacy observations.
+
+The self-contained SVG basemap uses Natural Earth 1:110m polygons in an Equal Earth projection. Source data is pinned to commit `9380cca83db5f9aef52d5e762765100745f84b27`. World Bank capital coordinates locate economies omitted at that generalized scale. All notebook countries are represented: the 35-country result has 33 outlines plus Maldives/Malta locator circles; the youth top five includes a Barbados locator. These fixed-size circles indicate position, not value magnitude. In the current extract, every eligible API country in all three comparisons also has a location. Unlocated future rows would remain available in the finder with an explicit note.
+
+The checked-in basemap needs no runtime map service, tile requests, credentials or additional JavaScript dependencies. To regenerate it:
+
+```sh
+python3 scripts/prepare-map.py
+```
+
+The script fetches the pinned Natural Earth source and the World Bank country/capital catalog, projects and resamples polygon rings, validates antimeridian edges and verifies that every saved notebook country has a location before writing `web/data/world-map.json`. Kosovo’s Natural Earth code is explicitly reconciled to World Bank `XKX`; identifiers such as France/Norway use source World Bank codes, with ISO fallbacks. Original source URLs, retrieval time and projection metadata are retained. Natural Earth’s public-domain terms and the projection implementation’s upstream license are recorded in `web/data/map-source-notes.txt`.
+
 ## Measures and coverage
 
 The main story uses these four indicators. The API comparison preserves source identity:
@@ -80,6 +98,8 @@ The main notebook queries average each series over all its available years and t
 - `web/analysis.mjs`: pure matched-year API analysis, correlation, state validation and analytical CSV.
 - `web/story.mjs`, `notebook-model.mjs`: notebook-first narrative, source switching, three distinct chart forms and source-specific findings.
 - `web/notebook-archive.mjs`: searchable saved results, original SQL and CSV exports.
+- `web/country-map.mjs`, `map-model.mjs`: linked map interactions, source-aware country joins, value states and bounded pan/zoom.
+- `scripts/prepare-map.py`: reproducible local basemap preparation.
 - `web/world-bank.mjs`: shared source-specific, paginated API client.
 - `web/explorer.html`, `app.mjs`, `styles.css`, `data-utils.mjs`: general indicator library/explorer.
 - `scripts/refresh-research.py`: reproducible public-data snapshot pull.
@@ -90,17 +110,18 @@ npm run check
 npm test
 ```
 
-All 32 tests cover the API client, null/zero preservation, pagination, cancellation, timeouts, country/year joins, thresholds, optional context, correlation, coverage, URL settings, CSV provenance and saved data integrity, exact notebook rankings/correlations, complete 35-country retention, archive consistency, source switching and matrix filtering/sorting. Browser checks are recorded in `VERIFICATION.md`.
+All 40 tests cover the API client, null/zero preservation, pagination, cancellation, timeouts, country/year joins, thresholds, optional context, correlation, coverage, URL settings, CSV provenance and saved data integrity, exact notebook rankings/correlations, complete 35-country retention, archive consistency, source switching, matrix filtering/sorting, geographic coverage, zero/missing map states, country-code joins and map navigation bounds. Browser checks are recorded in `VERIFICATION.md`.
 
 ## CS448B project direction
 
-The [CS448B final-project brief](https://magrawala.github.io/cs448b-fa26/finalProject.html) guides the article’s format: a public-facing visual explainer with a narrative and at least three substantially different interactive charts. The main article now has:
+The [CS448B final-project brief](https://magrawala.github.io/cs448b-fa26/finalProject.html) guides the article’s format: a public-facing visual explainer with a narrative and at least three substantially different interactive charts. The main article now has the three distinct chart forms plus a linked geographic view:
 
 | Chart | Reader task | Interaction beyond a tooltip |
 | --- | --- | --- |
 | Scatterplot | Compare the five youth-literacy leaders and the size of their differences | Magnified/full scale, country selection, API history and source comparison |
 | Ranked bar chart | Investigate the adult-literacy bottom ten and their spending | Reorder the fixed cohort by literacy/spending/name, select a country, inspect API history |
 | Country-by-indicator heatmap | Examine schooling, spending and literacy together | Cutoff experiments, match filtering, search, sorting and country drill-down |
+| Geographic choropleth with small-economy locators | Locate patterns across countries and regions | Shared source/cutoffs, measure and region filters, country selection, zoom, pan and linked history |
 
 Every chart has a source label, exact-value evidence, explanatory prose and export support. Original results and the API comparison remain distinct because both vintage and method differ. The evidence archive supports reproducibility and scope checks. Broad World Bank education data is well studied; the article’s topic/angle still needs a related-work and novelty review. Course deliverables outside this website include the design-review presentation, the voiceover demo video (up to two minutes) and submission through Canvas; none has been submitted or represented as complete here.
 
@@ -110,6 +131,9 @@ GitHub Pages deploys `web/` on pushes to `main` through `.github/workflows/pages
 
 ## Sources
 
+- [Natural Earth country boundaries](https://www.naturalearthdata.com/downloads/110m-cultural-vectors/)
+- [Natural Earth terms](https://www.naturalearthdata.com/about/terms-of-use/)
+- [Equal Earth projection implementation](https://github.com/d3/d3-geo/blob/main/src/projection/equalEarth.js)
 - [World Bank developer documentation](https://datahelpdesk.worldbank.org/knowledgebase/topics/125589-developer-information)
 - [API basic call structures](https://datahelpdesk.worldbank.org/knowledgebase/articles/898581-api-basic-call-structures)
 - [World Bank EdStats catalog](https://datacatalog.worldbank.org/search/dataset/0038480/education-statistics)

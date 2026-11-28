@@ -1,4 +1,5 @@
 import {readStoryOptions,storyResult,matrixRows,savedRowsCSV} from './notebook-model.mjs';
+import {createCountryMap} from './country-map.mjs';
 
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -8,7 +9,8 @@ const label={youth:'Youth literacy',adult:'Adult literacy',noSchool:'No schoolin
 const text=(x,y,value,attr='')=>`<text x="${x}" y="${y}" fill="#64726c" font-family="DM Sans,system-ui,sans-serif" font-size="11" ${attr}>${esc(value)}</text>`;
 function download(name,content){const url=URL.createObjectURL(new Blob([content],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 
-export function createStory({getData,notebook,onInspect}) {
+export function createStory({getData,notebook,onInspect,world}) {
+  let countryMap;
   let options=readStoryOptions(location.search);
   const selected={youth:'UZB',adult:'SOM',noSchool:'YEM'};
   const results={};
@@ -49,7 +51,7 @@ export function createStory({getData,notebook,onInspect}) {
     $('story-noSchool-finding').textContent=archived?`The original query returned 35 countries with spending above 4% of GDP and no schooling above 10%. At your cutoffs, ${schooling.featured.length} of those 35 saved countries qualify. Yemen’s original averages are 8.01% spending, 82.22% no schooling and 45.59% adult literacy.`:`${schooling.featured.length} of ${schooling.rows.length} eligible API countries exceed both cutoffs. Their comparisons use same-year observations within 2000–${Math.min(2025,data.metrics.noSchool.lastYear)}.`;
     $('story-noSchool-caution').textContent=archived?'The 35 rows are the original filtered result, not all countries. Lowering cutoffs cannot reveal countries excluded by the original SQL. Experiments use rounded saved values; the full original result remains available below.':'The API’s Barro-Lee no-schooling series ends in 2010. This is a historical attainment comparison, not a description of today’s schooling.';
     $('story-youth-countries').innerHTML=youth.featured.map(r=>`<button type="button" data-story-country="${r.id}" data-story-question="youth" aria-pressed="${r.id===selected.youth}">${esc(r.name)}</button>`).join('');
-    renderScatter(youth);renderBars(adult);renderMatrix(schooling);
+    renderScatter(youth);renderBars(adult);renderMatrix(schooling);countryMap?.render(selected);
   }
   function evidence(q,result){
     return `<table><caption class="sr-only">${options.basis==='notebook'?'Original notebook':'API comparison'} ${label[q]} result</caption><thead><tr><th scope="col">Country</th><th scope="col">Spending<br><small>% GDP</small></th><th scope="col">${label[q]}<br><small>%</small></th>${q==='noSchool'?'<th scope="col">Adult literacy<br><small>% ages 15+</small></th>':''}</tr></thead><tbody>${(q==='noSchool'?result.rows:options.basis==='notebook'?result.rows:result.featured).map(r=>`<tr><td>${esc(r.name)}<small>${r.id}</small></td><td>${f(r.x)}</td><td>${f(r.y)}</td>${q==='noSchool'?`<td>${f(r.adult)}</td>`:''}</tr>`).join('')}</tbody></table>`;
@@ -90,7 +92,7 @@ export function createStory({getData,notebook,onInspect}) {
   }
   function select(q,id,keyboard=false){
     const matrixScroll=$('story-noSchool-chart').querySelector('.matrix-scroll')?.scrollTop??0;
-    selected[q]=id;render();
+    selected[q]=id;countryMap?.selectChapter(q,id);render();
     const matrix=$('story-noSchool-chart').querySelector('.matrix-scroll');if(matrix)matrix.scrollTop=matrixScroll;
     if(keyboard)document.querySelector(`[data-story-question="${q}"][data-story-country="${id}"]`)?.focus({preventScroll:true});
   }
@@ -105,6 +107,8 @@ export function createStory({getData,notebook,onInspect}) {
   $('adult-sort').addEventListener('change',()=>renderBars(results.adult));$('youth-full-scale').addEventListener('change',()=>renderScatter(results.youth));
   document.querySelectorAll('[data-investigate],[data-follow]').forEach(button=>button.addEventListener('click',()=>{const q=button.dataset.investigate??button.dataset.follow;onInspect(q,selected[q],options,Boolean(button.dataset.follow));}));
   document.querySelectorAll('[data-story-csv]').forEach(button=>button.addEventListener('click',()=>{const q=button.dataset.storyCsv,result=results[q];if(options.basis==='notebook'){const rows=notebook.tables[q],columns=Object.keys(rows[0]);download(`notebook-${q}-original.csv`,savedRowsCSV(columns,rows.map(r=>columns.map(c=>r[c]))));}else{const rows=q==='noSchool'?result.rows:result.featured;download(`api-${q}-story.csv`,savedRowsCSV(['country','iso3','spending_pct_GDP','outcome_pct','matched_years','adult_literacy_context','adult_context_years','retrieved_at'],rows.map(r=>[r.name,r.id,r.x,r.y,r.years.join(';'),r.adult,r.adultYears.join(';'),getData().retrievedAt])));}}));
+  countryMap=createCountryMap({world,getData,getOptions:()=>options,notebook,onSelect:(q,id)=>select(q,id),onInspect,onThresholds:(spending,noSchool)=>{options.spending=spending;options.noSchool=noSchool;persist();render();}});
+  if(countryMap.initial.country)selected[countryMap.initial.question]=countryMap.initial.country;
   $('youth-full-scale').checked=options.basis==='api';
-  return {render,restore(){options=readStoryOptions(location.search);$('youth-full-scale').checked=options.basis==='api';render();}};
+  return {render,restore(){options=readStoryOptions(location.search);const mapState=countryMap.restore();if(mapState.country)selected[mapState.question]=mapState.country;$('youth-full-scale').checked=options.basis==='api';render();}};
 }
